@@ -24,11 +24,12 @@ import android.preference.PreferenceManager;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
-import com.google.common.base.Preconditions;
+
 import com.example.prototype2.CameraSource;
 import com.example.prototype2.CameraSource.SizePair;
 import com.example.prototype2.R;
 import com.google.android.gms.common.images.Size;
+import com.google.common.base.Preconditions;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 
 

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.prototype2"
-        minSdkVersion 21
+        minSdkVersion 16
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -45,4 +45,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
+
+configurations {
+    // Resolves dependency conflict caused by some dependencies use
+    // com.google.guava:guava and com.google.guava:listenablefuture together.
+    all*.exclude group: 'com.google.guava', module: 'listenablefuture'
 }

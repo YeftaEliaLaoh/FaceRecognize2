@@ -12,10 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -73,7 +71,7 @@ public class MainActivity extends AppCompatActivity
     private boolean needUpdateGraphicOverlayImageSourceInfo;
 
     private String selectedModel = FACE_DETECTION;
-    private int lensFacing = CameraSelector.LENS_FACING_BACK;
+    private int lensFacing = CameraSelector.LENS_FACING_FRONT;
     private CameraSelector cameraSelector;
 
     @Override
@@ -106,18 +104,6 @@ public class MainActivity extends AppCompatActivity
         if (graphicOverlay == null) {
             Log.d(TAG, "graphicOverlay is null");
         }
-
-        Spinner spinner = findViewById(R.id.spinner);
-        List<String> options = new ArrayList<>();
-        options.add(FACE_DETECTION);
-
-        // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, R.layout.spinner_style, options);
-        // Drop down layout style - list view with radio button
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // attaching data adapter to spinner
-        spinner.setAdapter(dataAdapter);
-        spinner.setOnItemSelectedListener(this);
 
         ToggleButton facingSwitch = findViewById(R.id.facing_switch);
         facingSwitch.setOnCheckedChangeListener(this);
