@@ -73,7 +73,7 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
     @Override
     protected void onSuccess(@NonNull List<Face> faces, @NonNull GraphicOverlay graphicOverlay) {
         for (Face face : faces) {
-            graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
+            //graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
             logExtrasForTesting(face);
         }
     }
