@@ -97,4 +97,7 @@
     <string name="pref_key_live_preview_pose_detector_show_in_frame_likelihood" translatable="false">lppdsifl</string>
     <string name="pref_key_still_image_pose_detector_show_in_frame_likelihood" translatable="false">sipdsifl</string>
 
+    <string name="login_page">Run Login Page</string>
+    <string name="register_page">Run Register Page</string>
+
 </resources>

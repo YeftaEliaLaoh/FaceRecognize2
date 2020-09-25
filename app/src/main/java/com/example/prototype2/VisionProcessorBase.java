@@ -44,7 +44,7 @@ import java.util.TimerTask;
 
 /**
  * Abstract base class for vision frame processors. Subclasses need to implement {@link
- * #onSuccess(Object, GraphicOverlay, AppDatabases)} to define what they want to with the detection results and
+ * #onSuccess(Object, GraphicOverlay, AppDatabases, String)} to define what they want to with the detection results and
  * {@link #detectInImage(InputImage)} to specify the detector object.
  *
  * @param <T> The type of the detected feature.
@@ -106,7 +106,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                 null, InputImage.fromBitmap(bitmap, 0),
                 graphicOverlay,
                 /* originalCameraImage= */ null,
-                /* shouldShowFps= */ false);
+                /* shouldShowFps= */ false, "");
     }
 
     // -----------------Code for processing live preview frame from Camera1 API-----------------------
@@ -148,7 +148,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                         InputImage.IMAGE_FORMAT_NV21),
                 graphicOverlay,
                 bitmap,
-                /* shouldShowFps= */ true)
+                /* shouldShowFps= */ true, "")
                 .addOnSuccessListener(executor, results -> processLatestImage(graphicOverlay));
     }
 
@@ -156,7 +156,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
     @Override
     @RequiresApi(VERSION_CODES.KITKAT)
     @ExperimentalGetImage
-    public void processImageProxy(ImageProxy image, GraphicOverlay graphicOverlay, AppDatabases appDatabases) {
+    public void processImageProxy(ImageProxy image, GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page) {
         if (isShutdown) {
             image.close();
             return;
@@ -172,7 +172,8 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                 InputImage.fromMediaImage(image.getImage(), image.getImageInfo().getRotationDegrees()),
                 graphicOverlay,
                 /* originalCameraImage= */ bitmap,
-                /* shouldShowFps= */ true)
+                /* shouldShowFps= */ true,
+                page)
                 // When the image is from CameraX analysis use case, must call image.close() on received
                 // images when finished using them. Otherwise, new images may not be received or the camera
                 // may stall.
@@ -184,7 +185,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
             AppDatabases appDatabases, final InputImage image,
             final GraphicOverlay graphicOverlay,
             @Nullable final Bitmap originalCameraImage,
-            boolean shouldShowFps) {
+            boolean shouldShowFps, String page) {
         final long startMs = SystemClock.elapsedRealtime();
         return detectInImage(image)
                 .addOnSuccessListener(
@@ -216,7 +217,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                             graphicOverlay.add(
                                     new InferenceInfoGraphic(
                                             graphicOverlay, currentLatencyMs, shouldShowFps ? framesPerSecond : null));
-                            VisionProcessorBase.this.onSuccess(results, graphicOverlay, appDatabases);
+                            VisionProcessorBase.this.onSuccess(results, graphicOverlay, appDatabases, page);
                             graphicOverlay.postInvalidate();
                         })
                 .addOnFailureListener(
@@ -247,7 +248,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
 
     protected abstract Task<T> detectInImage(InputImage image);
 
-    protected abstract void onSuccess(@NonNull T results, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases);
+    protected abstract void onSuccess(@NonNull T results, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page);
 
     protected abstract void onFailure(@NonNull Exception e);
 }

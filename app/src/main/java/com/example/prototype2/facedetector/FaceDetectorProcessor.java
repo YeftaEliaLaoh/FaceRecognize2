@@ -65,14 +65,14 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
     }
 
     @Override
-    protected void onSuccess(@NonNull List<Face> faces, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases) {
+    protected void onSuccess(@NonNull List<Face> faces, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page) {
         for (Face face : faces) {
             //graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
-            logExtrasForTesting(face, graphicOverlay, appDatabases);
+            logExtrasForTesting(face, graphicOverlay, appDatabases, page);
         }
     }
 
-    private static void logExtrasForTesting(Face face, GraphicOverlay graphicOverlay, AppDatabases appDatabases) {
+    private static void logExtrasForTesting(Face face, GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page) {
         if (face != null) {
             Log.v(MANUAL_TESTING_LOG, "face bounding box: " + face.getBoundingBox().flattenToString());
             Log.v(MANUAL_TESTING_LOG, "face Euler Angle X: " + face.getHeadEulerAngleX());
@@ -133,16 +133,35 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
             Log.v(MANUAL_TESTING_LOG, "face smiling probability: " + face.getSmilingProbability());
             Log.v(MANUAL_TESTING_LOG, "face tracking id: " + face.getTrackingId());
 
-            FaceEntity faceEntity = new FaceEntity();
-            faceEntity.setLeft(face.getBoundingBox().left);
-            faceEntity.setTop(face.getBoundingBox().top);
-            faceEntity.setRight(face.getBoundingBox().right);
-            faceEntity.setBottom(face.getBoundingBox().bottom);
-            long id = appDatabases.faceDao().insertNewEntry(faceEntity);
-            Toast.makeText(graphicOverlay.getContext(),
-                    "Save image with id: " + id,
-                    Toast.LENGTH_LONG)
-                    .show();
+            if (page.equalsIgnoreCase("register")) {
+                FaceEntity faceEntity = new FaceEntity();
+                faceEntity.setLeft(face.getBoundingBox().left);
+                faceEntity.setTop(face.getBoundingBox().top);
+                faceEntity.setRight(face.getBoundingBox().right);
+                faceEntity.setBottom(face.getBoundingBox().bottom);
+                long id = appDatabases.faceDao().insertNewEntry(faceEntity);
+                Toast.makeText(graphicOverlay.getContext(),
+                        "Set image with id: " + id,
+                        Toast.LENGTH_LONG)
+                        .show();
+            } else if (page.equalsIgnoreCase("login")) {
+                List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllByFace(face.getBoundingBox().left,
+                        face.getBoundingBox().top,
+                        face.getBoundingBox().right,
+                        face.getBoundingBox().bottom);
+                if (faceEntityList.isEmpty()) {
+                    Toast.makeText(graphicOverlay.getContext(),
+                            "Get image with id: ",
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+                else{
+                    Toast.makeText(graphicOverlay.getContext(),
+                            "Get image with id: "+ faceEntityList.get(0).getId(),
+                            Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
         }
     }
 

@@ -28,6 +28,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ScanActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme"></activity>
+        <activity
             android:name=".preference.SettingsActivity"
             android:exported="false" />
 
