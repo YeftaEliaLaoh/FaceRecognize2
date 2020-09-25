@@ -2,7 +2,7 @@
  * Copyright 2020 Google LLC. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * you may not use / file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -19,11 +19,14 @@ package com.example.prototype2.facedetector;
 import android.content.Context;
 import android.graphics.PointF;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.prototype2.GraphicOverlay;
 import com.example.prototype2.VisionProcessorBase;
+import com.example.prototype2.databases.AppDatabases;
+import com.example.prototype2.databases.entities.FaceEntity;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
@@ -44,15 +47,6 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
 
     private final FaceDetector detector;
 
-    public FaceDetectorProcessor(Context context) {
-        this(
-                context,
-                new FaceDetectorOptions.Builder()
-                        .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
-                        .enableTracking()
-                        .build());
-    }
-
     public FaceDetectorProcessor(Context context, FaceDetectorOptions options) {
         super(context);
         Log.v(MANUAL_TESTING_LOG, "Face detector options: " + options);
@@ -71,14 +65,14 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
     }
 
     @Override
-    protected void onSuccess(@NonNull List<Face> faces, @NonNull GraphicOverlay graphicOverlay) {
+    protected void onSuccess(@NonNull List<Face> faces, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases) {
         for (Face face : faces) {
             //graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
-            logExtrasForTesting(face);
+            logExtrasForTesting(face, graphicOverlay, appDatabases);
         }
     }
 
-    private static void logExtrasForTesting(Face face) {
+    private static void logExtrasForTesting(Face face, GraphicOverlay graphicOverlay, AppDatabases appDatabases) {
         if (face != null) {
             Log.v(MANUAL_TESTING_LOG, "face bounding box: " + face.getBoundingBox().flattenToString());
             Log.v(MANUAL_TESTING_LOG, "face Euler Angle X: " + face.getHeadEulerAngleX());
@@ -138,6 +132,17 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
                     "face right eye open probability: " + face.getRightEyeOpenProbability());
             Log.v(MANUAL_TESTING_LOG, "face smiling probability: " + face.getSmilingProbability());
             Log.v(MANUAL_TESTING_LOG, "face tracking id: " + face.getTrackingId());
+
+            FaceEntity faceEntity = new FaceEntity();
+            faceEntity.setLeft(face.getBoundingBox().left);
+            faceEntity.setTop(face.getBoundingBox().top);
+            faceEntity.setRight(face.getBoundingBox().right);
+            faceEntity.setBottom(face.getBoundingBox().bottom);
+            long id = appDatabases.faceDao().insertNewEntry(faceEntity);
+            Toast.makeText(graphicOverlay.getContext(),
+                    "Save image with id: " + id,
+                    Toast.LENGTH_LONG)
+                    .show();
         }
     }
 

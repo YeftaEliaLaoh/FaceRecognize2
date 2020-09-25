@@ -32,6 +32,7 @@ import androidx.annotation.RequiresApi;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageProxy;
 
+import com.example.prototype2.databases.AppDatabases;
 import com.example.prototype2.preference.PreferenceUtils;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskExecutors;
@@ -43,7 +44,7 @@ import java.util.TimerTask;
 
 /**
  * Abstract base class for vision frame processors. Subclasses need to implement {@link
- * #onSuccess(Object, GraphicOverlay)} to define what they want to with the detection results and
+ * #onSuccess(Object, GraphicOverlay, AppDatabases)} to define what they want to with the detection results and
  * {@link #detectInImage(InputImage)} to specify the detector object.
  *
  * @param <T> The type of the detected feature.
@@ -102,7 +103,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
     @Override
     public void processBitmap(Bitmap bitmap, final GraphicOverlay graphicOverlay) {
         requestDetectInImage(
-                InputImage.fromBitmap(bitmap, 0),
+                null, InputImage.fromBitmap(bitmap, 0),
                 graphicOverlay,
                 /* originalCameraImage= */ null,
                 /* shouldShowFps= */ false);
@@ -139,7 +140,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                         : BitmapUtils.getBitmap(data, frameMetadata);
 
         requestDetectInImage(
-                InputImage.fromByteBuffer(
+                null, InputImage.fromByteBuffer(
                         data,
                         frameMetadata.getWidth(),
                         frameMetadata.getHeight(),
@@ -155,7 +156,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
     @Override
     @RequiresApi(VERSION_CODES.KITKAT)
     @ExperimentalGetImage
-    public void processImageProxy(ImageProxy image, GraphicOverlay graphicOverlay) {
+    public void processImageProxy(ImageProxy image, GraphicOverlay graphicOverlay, AppDatabases appDatabases) {
         if (isShutdown) {
             image.close();
             return;
@@ -167,6 +168,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
         }
 
         requestDetectInImage(
+                appDatabases,
                 InputImage.fromMediaImage(image.getImage(), image.getImageInfo().getRotationDegrees()),
                 graphicOverlay,
                 /* originalCameraImage= */ bitmap,
@@ -179,7 +181,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
 
     // -----------------Common processing logic-------------------------------------------------------
     private Task<T> requestDetectInImage(
-            final InputImage image,
+            AppDatabases appDatabases, final InputImage image,
             final GraphicOverlay graphicOverlay,
             @Nullable final Bitmap originalCameraImage,
             boolean shouldShowFps) {
@@ -214,7 +216,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                             graphicOverlay.add(
                                     new InferenceInfoGraphic(
                                             graphicOverlay, currentLatencyMs, shouldShowFps ? framesPerSecond : null));
-                            VisionProcessorBase.this.onSuccess(results, graphicOverlay);
+                            VisionProcessorBase.this.onSuccess(results, graphicOverlay, appDatabases);
                             graphicOverlay.postInvalidate();
                         })
                 .addOnFailureListener(
@@ -245,7 +247,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
 
     protected abstract Task<T> detectInImage(InputImage image);
 
-    protected abstract void onSuccess(@NonNull T results, @NonNull GraphicOverlay graphicOverlay);
+    protected abstract void onSuccess(@NonNull T results, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases);
 
     protected abstract void onFailure(@NonNull Exception e);
 }

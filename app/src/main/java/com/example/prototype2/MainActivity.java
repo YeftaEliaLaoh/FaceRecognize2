@@ -31,7 +31,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory;
+import androidx.room.Room;
 
+import com.example.prototype2.databases.AppDatabases;
 import com.example.prototype2.facedetector.FaceDetectorProcessor;
 import com.example.prototype2.preference.PreferenceUtils;
 import com.example.prototype2.preference.SettingsActivity;
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity
     private String selectedModel = FACE_DETECTION;
     private int lensFacing = CameraSelector.LENS_FACING_FRONT;
     private CameraSelector cameraSelector;
+
+    private AppDatabases appDatabases;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +137,11 @@ public class MainActivity extends AppCompatActivity
         if (!allPermissionsGranted()) {
             getRuntimePermissions();
         }
+
+        appDatabases = Room.databaseBuilder(getApplicationContext(),
+                AppDatabases.class, "database-name"
+        ).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+
     }
 
     @Override
@@ -311,7 +320,7 @@ public class MainActivity extends AppCompatActivity
                         needUpdateGraphicOverlayImageSourceInfo = false;
                     }
                     try {
-                        imageProcessor.processImageProxy(imageProxy, graphicOverlay);
+                        imageProcessor.processImageProxy(imageProxy, graphicOverlay, appDatabases);
                     } catch (MlKitException e) {
                         Log.e(TAG, "Failed to process image. Error: " + e.getLocalizedMessage());
                         Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT)
