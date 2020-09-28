@@ -13,6 +13,7 @@ public interface FaceDao {
     @Insert
     long insertNewEntry(FaceEntity faceEntity);
 
-    @Query("SELECT * FROM FaceEntity ;")
-    List<FaceEntity> getAllData();
+    @Query("SELECT * FROM FaceEntity WHERE faceEntity_headEularAngleX = :headEularAngleX and faceEntity_headEularAngleY = :headEularAngleY " +
+            "and faceEntity_headEularAngleZ = :headEularAngleZ ;")
+    List<FaceEntity> getAllByHeadEularAngle(float headEularAngleX, float headEularAngleY, float headEularAngleZ);
 }

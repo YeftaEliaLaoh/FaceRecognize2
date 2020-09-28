@@ -18,7 +18,6 @@ package com.example.prototype2.facedetector;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,7 +36,6 @@ import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 import com.google.mlkit.vision.face.FaceLandmark;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -139,48 +137,34 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
             Log.v(MANUAL_TESTING_LOG, "face smiling probability: " + face.getSmilingProbability());
             Log.v(MANUAL_TESTING_LOG, "face tracking id: " + face.getTrackingId());
 
-            float left = (float) (face.getBoundingBox().width() * 0.2);
-            float width = (float) (face.getBoundingBox().width() * 0.6);
-            float top = (float) (face.getBoundingBox().height() * 0.2);
-            float height = (float) (face.getBoundingBox().height() * 0.6);
-
-            Bitmap photo = Bitmap.createBitmap(originalCameraImage,
-                    ((int) (left)),
-                    (int) (top),
-                    ((int) (width)),
-                    (int) (height));
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-            byte[] bytes = byteArrayOutputStream.toByteArray();
-
             if (page.equalsIgnoreCase("register")) {
                 FaceEntity faceEntity = new FaceEntity();
-                faceEntity.setImage(bytes);
+                faceEntity.setHeadEulerAngleX(face.getHeadEulerAngleX());
+                faceEntity.setHeadEulerAngleY(face.getHeadEulerAngleY());
+                faceEntity.setHeadEulerAngleZ(face.getHeadEulerAngleZ());
+
                 long id = appDatabases.faceDao().insertNewEntry(faceEntity);
                 Toast.makeText(graphicOverlay.getContext(),
                         "Set image with id: " + id,
                         Toast.LENGTH_LONG)
                         .show();
             } else if (page.equalsIgnoreCase("login")) {
-                List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllData();
-                for (FaceEntity element : faceEntityList) {
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(element.getImage(),
-                            0, element.getImage().length);
-                    if (bitmap.sameAs(photo)) {
-                        Log.v(MANUAL_TESTING_LOG, "successa : " + faceEntityList.get(0).getId());
-                    }
-                }
-                /*if (faceEntityList.isEmpty()) {
+                List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllByHeadEularAngle(face.getHeadEulerAngleX(), face.getHeadEulerAngleY(), face.getHeadEulerAngleZ());
+                if (faceEntityList.isEmpty()) {
                     Toast.makeText(graphicOverlay.getContext(),
                             "Get image with id: ",
                             Toast.LENGTH_LONG)
                             .show();
                 } else {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for (FaceEntity element : faceEntityList) {
+                        stringBuilder.append(element.getId()).append(" ");
+                    }
                     Toast.makeText(graphicOverlay.getContext(),
-                            "Get image with id: " + faceEntityList.get(0).getId(),
+                            "Get image with id: " + stringBuilder,
                             Toast.LENGTH_LONG)
                             .show();
-                }*/
+                }
             }
         }
     }

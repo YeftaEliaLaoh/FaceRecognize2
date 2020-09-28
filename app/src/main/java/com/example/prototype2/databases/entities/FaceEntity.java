@@ -10,8 +10,14 @@ public class FaceEntity {
     @ColumnInfo(name = "faceEntity_id")
     private int id;
 
-    @ColumnInfo(name = "faceEntity_image", typeAffinity = ColumnInfo.BLOB)
-    public byte[] image;
+    @ColumnInfo(name = "faceEntity_headEularAngleX")
+    public float headEulerAngleX;
+
+    @ColumnInfo(name = "faceEntity_headEularAngleY")
+    public float headEulerAngleY;
+
+    @ColumnInfo(name = "faceEntity_headEularAngleZ")
+    public float headEulerAngleZ;
 
     public int getId() {
         return id;
@@ -21,11 +27,27 @@ public class FaceEntity {
         this.id = id;
     }
 
-    public byte[] getImage() {
-        return image;
+    public float getHeadEulerAngleX() {
+        return headEulerAngleX;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setHeadEulerAngleX(float headEulerAngleX) {
+        this.headEulerAngleX = headEulerAngleX;
+    }
+
+    public float getHeadEulerAngleY() {
+        return headEulerAngleY;
+    }
+
+    public void setHeadEulerAngleY(float headEulerAngleY) {
+        this.headEulerAngleY = headEulerAngleY;
+    }
+
+    public float getHeadEulerAngleZ() {
+        return headEulerAngleZ;
+    }
+
+    public void setHeadEulerAngleZ(float headEulerAngleZ) {
+        this.headEulerAngleZ = headEulerAngleZ;
     }
 }
