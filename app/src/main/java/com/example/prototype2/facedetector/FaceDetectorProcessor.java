@@ -18,6 +18,7 @@ package com.example.prototype2.facedetector;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.util.Log;
 import android.widget.Toast;
@@ -161,8 +162,15 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
                         Toast.LENGTH_LONG)
                         .show();
             } else if (page.equalsIgnoreCase("login")) {
-                List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllByImage(bytes);
-                if (faceEntityList.isEmpty()) {
+                List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllData();
+                for (FaceEntity element : faceEntityList) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(element.getImage(),
+                            0, element.getImage().length);
+                    if (bitmap.sameAs(photo)) {
+                        Log.v(MANUAL_TESTING_LOG, "successa : " + faceEntityList.get(0).getId());
+                    }
+                }
+                /*if (faceEntityList.isEmpty()) {
                     Toast.makeText(graphicOverlay.getContext(),
                             "Get image with id: ",
                             Toast.LENGTH_LONG)
@@ -172,7 +180,7 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
                             "Get image with id: " + faceEntityList.get(0).getId(),
                             Toast.LENGTH_LONG)
                             .show();
-                }
+                }*/
             }
         }
     }

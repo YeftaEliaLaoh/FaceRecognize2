@@ -13,6 +13,6 @@ public interface FaceDao {
     @Insert
     long insertNewEntry(FaceEntity faceEntity);
 
-    @Query("SELECT * FROM FaceEntity WHERE faceEntity_image = :bytes ;")
-    List<FaceEntity> getAllByImage(byte[] bytes);
+    @Query("SELECT * FROM FaceEntity ;")
+    List<FaceEntity> getAllData();
 }
