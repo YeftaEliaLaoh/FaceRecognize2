@@ -10,8 +10,8 @@ public class FaceEntity {
     @ColumnInfo(name = "faceEntity_id")
     private int id;
 
-    @ColumnInfo(name = "faceEntity_image")
-    int image;
+    @ColumnInfo(name = "faceEntity_image", typeAffinity = ColumnInfo.BLOB)
+    public byte[] image;
 
     public int getId() {
         return id;
@@ -21,11 +21,11 @@ public class FaceEntity {
         this.id = id;
     }
 
-    public int getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(int image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 }

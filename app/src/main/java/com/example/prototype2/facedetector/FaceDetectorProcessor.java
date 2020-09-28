@@ -20,12 +20,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.prototype2.GraphicOverlay;
 import com.example.prototype2.VisionProcessorBase;
 import com.example.prototype2.databases.AppDatabases;
+import com.example.prototype2.databases.entities.FaceEntity;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
@@ -34,6 +36,7 @@ import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 import com.google.mlkit.vision.face.FaceLandmark;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -136,24 +139,27 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
             Log.v(MANUAL_TESTING_LOG, "face tracking id: " + face.getTrackingId());
 
             if (page.equalsIgnoreCase("register")) {
-                //FaceEntity faceEntity = new FaceEntity();
                 float left = (float) (face.getBoundingBox().width() * 0.2);
-                float newWidth = (float) (face.getBoundingBox().width() * 0.6);
-
+                float width = (float) (face.getBoundingBox().width() * 0.6);
                 float top = (float) (face.getBoundingBox().height() * 0.2);
-                float newHeight = (float) (face.getBoundingBox().height() * 0.6);
+                float height = (float) (face.getBoundingBox().height() * 0.6);
 
-                Bitmap.createBitmap(originalCameraImage,
+                Bitmap photo = Bitmap.createBitmap(originalCameraImage,
                         ((int) (left)),
                         (int) (top),
-                        ((int) (newWidth)),
-                        (int) (newHeight));
+                        ((int) (width)),
+                        (int) (height));
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                byte[] bytes = byteArrayOutputStream.toByteArray();
 
-                /*long id = appDatabases.faceDao().insertNewEntry(faceEntity);
+                FaceEntity faceEntity = new FaceEntity();
+                faceEntity.setImage(bytes);
+                long id = appDatabases.faceDao().insertNewEntry(faceEntity);
                 Toast.makeText(graphicOverlay.getContext(),
                         "Set image with id: " + id,
                         Toast.LENGTH_LONG)
-                        .show();*/
+                        .show();
             }/* else if (page.equalsIgnoreCase("login")) {
                 List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllByFace(face.getBoundingBox().left,
                         face.getBoundingBox().top,
