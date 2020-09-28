@@ -138,21 +138,21 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
             Log.v(MANUAL_TESTING_LOG, "face smiling probability: " + face.getSmilingProbability());
             Log.v(MANUAL_TESTING_LOG, "face tracking id: " + face.getTrackingId());
 
+            float left = (float) (face.getBoundingBox().width() * 0.2);
+            float width = (float) (face.getBoundingBox().width() * 0.6);
+            float top = (float) (face.getBoundingBox().height() * 0.2);
+            float height = (float) (face.getBoundingBox().height() * 0.6);
+
+            Bitmap photo = Bitmap.createBitmap(originalCameraImage,
+                    ((int) (left)),
+                    (int) (top),
+                    ((int) (width)),
+                    (int) (height));
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] bytes = byteArrayOutputStream.toByteArray();
+
             if (page.equalsIgnoreCase("register")) {
-                float left = (float) (face.getBoundingBox().width() * 0.2);
-                float width = (float) (face.getBoundingBox().width() * 0.6);
-                float top = (float) (face.getBoundingBox().height() * 0.2);
-                float height = (float) (face.getBoundingBox().height() * 0.6);
-
-                Bitmap photo = Bitmap.createBitmap(originalCameraImage,
-                        ((int) (left)),
-                        (int) (top),
-                        ((int) (width)),
-                        (int) (height));
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                byte[] bytes = byteArrayOutputStream.toByteArray();
-
                 FaceEntity faceEntity = new FaceEntity();
                 faceEntity.setImage(bytes);
                 long id = appDatabases.faceDao().insertNewEntry(faceEntity);
@@ -160,11 +160,8 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
                         "Set image with id: " + id,
                         Toast.LENGTH_LONG)
                         .show();
-            }/* else if (page.equalsIgnoreCase("login")) {
-                List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllByFace(face.getBoundingBox().left,
-                        face.getBoundingBox().top,
-                        face.getBoundingBox().right,
-                        face.getBoundingBox().bottom);
+            } else if (page.equalsIgnoreCase("login")) {
+                List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllByImage(bytes);
                 if (faceEntityList.isEmpty()) {
                     Toast.makeText(graphicOverlay.getContext(),
                             "Get image with id: ",
@@ -176,7 +173,7 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
                             Toast.LENGTH_LONG)
                             .show();
                 }
-            }*/
+            }
         }
     }
 
