@@ -45,7 +45,7 @@ import java.util.TimerTask;
 /**
  * Abstract base class for vision frame processors. Subclasses need to implement {@link
  * #onSuccess(Object, GraphicOverlay, AppDatabases, String)} to define what they want to with the detection results and
- * {@link #detectInImage(InputImage)} to specify the detector object.
+ * {@link #detectInImage(InputImage, Bitmap)} to specify the detector object.
  *
  * @param <T> The type of the detected feature.
  */
@@ -97,16 +97,6 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
                 },
                 /* delay= */ 0,
                 /* period= */ 1000);
-    }
-
-    // -----------------Code for processing single still image----------------------------------------
-    @Override
-    public void processBitmap(Bitmap bitmap, final GraphicOverlay graphicOverlay) {
-        requestDetectInImage(
-                null, InputImage.fromBitmap(bitmap, 0),
-                graphicOverlay,
-                /* originalCameraImage= */ null,
-                /* shouldShowFps= */ false, "");
     }
 
     // -----------------Code for processing live preview frame from Camera1 API-----------------------
@@ -187,7 +177,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
             @Nullable final Bitmap originalCameraImage,
             boolean shouldShowFps, String page) {
         final long startMs = SystemClock.elapsedRealtime();
-        return detectInImage(image)
+        return detectInImage(image, originalCameraImage)
                 .addOnSuccessListener(
                         executor,
                         results -> {
@@ -246,7 +236,7 @@ public abstract class VisionProcessorBase<T> implements VisionImageProcessor {
         fpsTimer.cancel();
     }
 
-    protected abstract Task<T> detectInImage(InputImage image);
+    protected abstract Task<T> detectInImage(InputImage image, Bitmap originalCameraImage);
 
     protected abstract void onSuccess(@NonNull T results, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page);
 

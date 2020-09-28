@@ -10,14 +10,8 @@ public class FaceEntity {
     @ColumnInfo(name = "faceEntity_id")
     private int id;
 
-    @ColumnInfo(name = "faceEntity_left")
-    int left;
-    @ColumnInfo(name = "faceEntity_top")
-    int top;
-    @ColumnInfo(name = "faceEntity_right")
-    int right;
-    @ColumnInfo(name = "faceEntity_bottom")
-    int bottom;
+    @ColumnInfo(name = "faceEntity_image")
+    int image;
 
     public int getId() {
         return id;
@@ -27,35 +21,11 @@ public class FaceEntity {
         this.id = id;
     }
 
-    public int getLeft() {
-        return left;
+    public int getImage() {
+        return image;
     }
 
-    public void setLeft(int left) {
-        this.left = left;
-    }
-
-    public int getTop() {
-        return top;
-    }
-
-    public void setTop(int top) {
-        this.top = top;
-    }
-
-    public int getRight() {
-        return right;
-    }
-
-    public void setRight(int right) {
-        this.right = right;
-    }
-
-    public int getBottom() {
-        return bottom;
-    }
-
-    public void setBottom(int bottom) {
-        this.bottom = bottom;
+    public void setImage(int image) {
+        this.image = image;
     }
 }

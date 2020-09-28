@@ -17,16 +17,15 @@
 package com.example.prototype2.facedetector;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.prototype2.GraphicOverlay;
 import com.example.prototype2.VisionProcessorBase;
 import com.example.prototype2.databases.AppDatabases;
-import com.example.prototype2.databases.entities.FaceEntity;
 import com.google.android.gms.tasks.Task;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
@@ -47,6 +46,8 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
 
     private final FaceDetector detector;
 
+    private Bitmap originalCameraImage = null;
+
     public FaceDetectorProcessor(Context context, FaceDetectorOptions options) {
         super(context);
         Log.v(MANUAL_TESTING_LOG, "Face detector options: " + options);
@@ -60,19 +61,20 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
     }
 
     @Override
-    protected Task<List<Face>> detectInImage(InputImage image) {
+    protected Task<List<Face>> detectInImage(InputImage image, Bitmap originalCameraImage) {
+        this.originalCameraImage = originalCameraImage;
         return detector.process(image);
     }
 
     @Override
     protected void onSuccess(@NonNull List<Face> faces, @NonNull GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page) {
         for (Face face : faces) {
-            //graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
+            // graphicOverlay.add(new FaceGraphic(graphicOverlay, face));
             logExtrasForTesting(face, graphicOverlay, appDatabases, page);
         }
     }
 
-    private static void logExtrasForTesting(Face face, GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page) {
+    private void logExtrasForTesting(Face face, GraphicOverlay graphicOverlay, AppDatabases appDatabases, String page) {
         if (face != null) {
             Log.v(MANUAL_TESTING_LOG, "face bounding box: " + face.getBoundingBox().flattenToString());
             Log.v(MANUAL_TESTING_LOG, "face Euler Angle X: " + face.getHeadEulerAngleX());
@@ -134,17 +136,25 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
             Log.v(MANUAL_TESTING_LOG, "face tracking id: " + face.getTrackingId());
 
             if (page.equalsIgnoreCase("register")) {
-                FaceEntity faceEntity = new FaceEntity();
-                faceEntity.setLeft(face.getBoundingBox().left);
-                faceEntity.setTop(face.getBoundingBox().top);
-                faceEntity.setRight(face.getBoundingBox().right);
-                faceEntity.setBottom(face.getBoundingBox().bottom);
-                long id = appDatabases.faceDao().insertNewEntry(faceEntity);
+                //FaceEntity faceEntity = new FaceEntity();
+                float left = (float) (face.getBoundingBox().width() * 0.2);
+                float newWidth = (float) (face.getBoundingBox().width() * 0.6);
+
+                float top = (float) (face.getBoundingBox().height() * 0.2);
+                float newHeight = (float) (face.getBoundingBox().height() * 0.6);
+
+                Bitmap.createBitmap(originalCameraImage,
+                        ((int) (left)),
+                        (int) (top),
+                        ((int) (newWidth)),
+                        (int) (newHeight));
+
+                /*long id = appDatabases.faceDao().insertNewEntry(faceEntity);
                 Toast.makeText(graphicOverlay.getContext(),
                         "Set image with id: " + id,
                         Toast.LENGTH_LONG)
-                        .show();
-            } else if (page.equalsIgnoreCase("login")) {
+                        .show();*/
+            }/* else if (page.equalsIgnoreCase("login")) {
                 List<FaceEntity> faceEntityList = appDatabases.faceDao().getAllByFace(face.getBoundingBox().left,
                         face.getBoundingBox().top,
                         face.getBoundingBox().right,
@@ -154,14 +164,13 @@ public class FaceDetectorProcessor extends VisionProcessorBase<List<Face>> {
                             "Get image with id: ",
                             Toast.LENGTH_LONG)
                             .show();
-                }
-                else{
+                } else {
                     Toast.makeText(graphicOverlay.getContext(),
-                            "Get image with id: "+ faceEntityList.get(0).getId(),
+                            "Get image with id: " + faceEntityList.get(0).getId(),
                             Toast.LENGTH_LONG)
                             .show();
                 }
-            }
+            }*/
         }
     }
 

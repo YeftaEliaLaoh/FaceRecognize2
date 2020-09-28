@@ -16,7 +16,6 @@
 
 package com.example.prototype2;
 
-import android.graphics.Bitmap;
 import android.os.Build.VERSION_CODES;
 
 import androidx.annotation.RequiresApi;
@@ -31,11 +30,6 @@ import java.nio.ByteBuffer;
  * An interface to process the images with different vision detectors and custom image models.
  */
 public interface VisionImageProcessor {
-
-    /**
-     * Processes a bitmap image.
-     */
-    void processBitmap(Bitmap bitmap, GraphicOverlay graphicOverlay);
 
     /**
      * Processes ByteBuffer image data, e.g. used for Camera1 live preview case.
